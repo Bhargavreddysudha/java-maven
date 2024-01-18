@@ -1,15 +1,33 @@
 pipeline {
     agent any
 
+    environment {
+        // Define the Git repository URL and branch
+        GIT_REPO_URL = 'https://github.com/Bhargavreddysudha/java-maven.git'
+        GIT_BRANCH = 'main'
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 // Checkout code from source control
                 checkout([$class: 'GitSCM', 
-                          branches: [[name: '*/main']], 
-                          userRemoteConfigs: [[url: 'https://github.com/Bhargavreddysudha/java-maven.git']]])
+                          branches: [[name: "*/${GIT_BRANCH}"]], 
+                          userRemoteConfigs: [[url: "${GIT_REPO_URL}"]]])
             }
         }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def mvn = tool 'Default Maven'
+                    withSonarQubeEnv() {
+                        sh "${mvn}/bin/mvn clean verify sonar:sonar -Dsonar.projectKey=Java-Code"
+                    }
+                }
+            }
+        }
+
         // Add more stages as needed for your build and deployment process
     }
 
