@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from source control (replace with your SCM and credentias)
+                wget git@github.com:Bhargavreddysudha/java-maven.git
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Run SonarQube analysis using Maven
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Check Quality Gate') {
+            steps {
+                script {
+                    def qualityGateStatus = sh(script: 'mvn sonar:sonar -Dsonar.projectKey=your_project_key -Dsonar.host.url=http://your-sonarqube-server:9000 -Dsonar.login=your_sonar_login -Dsonar.password=your_sonar_password -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.projectName=your_project_name -Dsonar.qualitygate.projectKey=your_project_key', returnStatus: true).trim()
+
+                    // Fail the build if the quality gate status is not 'OK'
+                    if (qualityGateStatus != '0') {
+                        error "Quality gate failed: ${qualityGateStatus}"
+                    }
+                }
+            }
+        }
+
+        stage('Build and Package') {
+            steps {
+                // Build and package your Java code (replace with your build tool and command)
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Push to S3') {
+            steps {
+                // Push the packaged JAR to S3 (replace with your S3 details and credentials)
+                sh 'aws s3 cp target/your-app.jar s3://your-s3-bucket/'
+            }
+        }
+    }
+}
