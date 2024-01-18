@@ -4,9 +4,14 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout code from source control (replace with your SCM and credentias)
-                https://github.com/Bhargavreddysudha/java-maven
+                // Checkout code from source control
+                checkout([$class: 'GitSCM', 
+                          branches: [[name: '*/main']], 
+                          userRemoteConfigs: [[url: 'https://github.com/Bhargavreddysudha/java-maven.git']]])
             }
         }
-     }            
-  }    
+        // Add more stages as needed for your build and deployment process
+    }
+
+    // Add post-build actions or other configurations as needed
+}
