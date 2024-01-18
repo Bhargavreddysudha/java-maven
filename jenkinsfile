@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Checkout code from source control (replace with your SCM and credentias)
-                git clone git@github.com:Bhargavreddysudha/java-maven.git
+                https://github.com/Bhargavreddysudha/java-maven
             }
         }
 
